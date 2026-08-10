@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mandi — Everything, One Cart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#20263B;
+    --ink-soft:#2B3350;
+    --paper:#F6EFE0;
+    --paper-alt:#FFFBF3;
+    --marigold:#E8A33D;
+    --marigold-dark:#C97F1D;
+    --chili:#C1432D;
+    --chili-dark:#9F3320;
+    --teal:#2F6F63;
+    --charcoal:#2B2620;
+    --line: rgba(32,38,59,0.14);
+    --shadow: 0 6px 20px rgba(32,38,59,0.10);
+    --radius: 4px;
+    --fs-display: clamp(2.6rem, 6vw, 4.6rem);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--charcoal);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:800;
+    letter-spacing:0.01em;
+    line-height:0.95;
+    margin:0;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  img,svg{display:block;max-width:100%;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:inherit;}
+
+  *:focus-visible{ outline:3px solid var(--marigold); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:var(--ink);
+    color:var(--paper-alt);
+    padding:14px 20px;
+    display:flex; align-items:center; gap:18px;
+    flex-wrap:wrap;
+    border-bottom:3px solid var(--marigold);
+  }
+  .brand{ display:flex; align-items:baseline; gap:10px; margin-right:auto; }
+  .brand .display{ font-size:2rem; color:var(--paper-alt); }
+  .brand .tagline{ font-size:0.72rem; color:var(--marigold); text-transform:uppercase; letter-spacing:0.14em; }
+
+  .search-wrap{
+    flex:1 1 320px; max-width:520px;
+    display:flex; background:var(--paper-alt); border-radius:var(--radius);
+    overflow:hidden; border:2px solid var(--marigold);
+  }
+  .search-wrap input{
+    flex:1; border:0; padding:10px 14px; font-size:0.95rem;
+    background:transparent; color:var(--charcoal);
+  }
+  .search-wrap input:focus{ outline:none; }
+  .search-wrap button{
+    border:0; background:var(--marigold); color:var(--ink);
+    padding:0 16px; font-weight:700;
+  }
+
+  .cart-btn{
+    position:relative;
+    display:flex; align-items:center; gap:8px;
+    background:var(--chili); color:var(--paper-alt);
+    border:0; border-radius:var(--radius);
+    padding:10px 16px; font-weight:700; font-size:0.95rem;
+  }
+  .cart-btn .badge{
+    position:absolute; top:-8px; right:-8px;
+    background:var(--marigold); color:var(--ink);
+    border-radius:50%; min-width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.72rem; font-weight:800; font-family:'IBM Plex Mono',monospace;
+    border:2px solid var(--ink);
+  }
+  .cart-btn.pulse{ animation:pulse .35s ease; }
+  @keyframes pulse{ 0%{transform:scale(1);} 45%{transform:scale(1.09);} 100%{transform:scale(1);} }
+
+  /* ---------- Category rail ---------- */
+  .category-rail{
+    display:flex; gap:10px; padding:14px 20px;
+    overflow-x:auto; background:var(--paper-alt);
+    border-bottom:1px solid var(--line);
+  }
+  .category-rail::-webkit-scrollbar{ height:6px; }
+  .chip{
+    flex:0 0 auto;
+    border:2px solid var(--ink);
+    background:transparent; color:var(--ink);
+    padding:7px 14px; border-radius:999px;
+    font-size:0.82rem; font-weight:600; white-space:nowrap;
+  }
+  .chip.active{ background:var(--ink); color:var(--paper-alt); }
+
+  /* ---------- Hero / signboard ---------- */
+  .hero{ padding:44px 20px 30px; max-width:1180px; margin:0 auto; }
+  .hero .display{ font-size:var(--fs-display); color:var(--ink); }
+  .hero .display span{ color:var(--chili); }
+  .hero p.sub{ margin-top:10px; max-width:56ch; font-size:1.05rem; color:var(--ink-soft); }
+
+  .rule-boards{ display:flex; gap:18px; flex-wrap:wrap; margin-top:26px; }
+  .board{
+    flex:1 1 280px;
+    border:3px solid var(--ink);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    background:var(--paper-alt);
+    box-shadow:4px 4px 0 var(--ink);
+    transform:rotate(-0.6deg);
+  }
+  .board:nth-child(2){ transform:rotate(0.6deg); }
+  .board .board-top{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .board .board-icon{ font-size:1.5rem; }
+  .board .board-title{ font-family:'Big Shoulders Display'; font-weight:800; font-size:1.3rem; color:var(--ink); }
+  .board.marigold{ border-color:var(--marigold-dark); box-shadow:4px 4px 0 var(--marigold-dark); }
+  .board.marigold .board-title{ color:var(--marigold-dark); }
+  .board.teal{ border-color:var(--teal); box-shadow:4px 4px 0 var(--teal); }
+  .board.teal .board-title{ color:var(--teal); }
+  .board p{ margin:0; font-size:0.9rem; color:var(--ink-soft); }
+  .board .mono{ font-size:0.78rem; color:var(--charcoal); opacity:0.75; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    max-width:1180px; margin:0 auto; padding:8px 20px 4px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .toolbar .count{ font-size:0.85rem; color:var(--ink-soft); }
+  .toolbar select{
+    border:2px solid var(--ink); background:var(--paper-alt); color:var(--ink);
+    padding:6px 10px; border-radius:var(--radius); font-size:0.85rem; font-weight:600;
+  }
+
+  /* ---------- Product grid ---------- */
+  .grid{
+    max-width:1180px; margin:0 auto; padding:18px 20px 60px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:20px;
+  }
+  .card{
+    position:relative;
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    clip-path:polygon(18px 0, 100% 0, 100% 100%, 0 100%, 0 18px);
+    padding:18px 16px 16px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:10px;
+    opacity:0; animation:riseIn .5s ease both;
+  }
+  @keyframes riseIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+  .card::before{
+    content:''; position:absolute; top:7px; left:7px;
+    width:9px; height:9px; border-radius:50%;
+    border:2px solid var(--ink); background:var(--paper);
+  }
+  .card .card-icon{
+    width:56px; height:56px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; background:var(--tint,var(--paper));
+    align-self:flex-start;
+  }
+  .card .name{ font-weight:700; font-size:0.98rem; line-height:1.25; min-height:2.4em; }
+  .card .cat-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--teal); font-weight:700; }
+
+  .price-breakdown{
+    border-top:1px dashed var(--line); padding-top:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.76rem; color:var(--ink-soft);
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .price-breakdown .payable{ font-size:0.95rem; color:var(--ink); font-weight:700; margin-top:2px; }
+  .price-breakdown .row{ display:flex; justify-content:space-between; }
+
+  .free-badge{
+    position:absolute; top:14px; right:-6px;
+    background:var(--marigold); color:var(--ink);
+    font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em;
+    padding:4px 10px; transform:rotate(6deg);
+    border:2px solid var(--ink); border-radius:2px;
+    box-shadow:2px 2px 0 var(--ink);
+  }
+
+  .add-btn{
+    margin-top:auto;
+    border:2px solid var(--ink); background:var(--marigold); color:var(--ink);
+    font-weight:700; font-size:0.85rem; padding:9px 12px; border-radius:var(--radius);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .add-btn:hover{ background:var(--marigold-dark); transform:translateY(-2px); }
+
+  .empty-grid{ text-align:center; padding:60px 20px; color:var(--ink-soft); }
+  .empty-grid .emoji{ font-size:2.4rem; }
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--ink); color:var(--paper-alt);
+    padding:22px 20px; text-align:center; font-size:0.8rem;
+  }
+  footer .mono{ color:var(--marigold); }
+
+  /* ---------- Overlay ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(32,38,59,0.55);
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+    z-index:50;
+  }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+
+  /* ---------- Cart drawer ---------- */
+  .cart-drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(420px,100%);
+    background:var(--paper-alt); z-index:60;
+    transform:translateX(100%); transition:transform .3s ease;
+    display:flex; flex-direction:column;
+    box-shadow:-6px 0 24px rgba(0,0,0,0.25);
+  }
+  .cart-drawer.open{ transform:translateX(0); }
+  .torn-top{
+    height:12px; flex:0 0 auto; background:var(--ink);
+    clip-path:polygon(0% 12px,4% 0,8% 12px,12% 0,16% 12px,20% 0,24% 12px,28% 0,32% 12px,36% 0,40% 12px,44% 0,48% 12px,52% 0,56% 12px,60% 0,64% 12px,68% 0,72% 12px,76% 0,80% 12px,84% 0,88% 12px,92% 0,96% 12px,100% 0,100% 100%,0 100%);
+  }
+  .cart-header{
+    padding:16px 20px 10px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px dashed var(--line);
+  }
+  .cart-header h2{ font-size:1.5rem; color:var(--ink); }
+  .cart-header .sub{ font-size:0.68rem; color:var(--ink-soft); font-family:'IBM Plex Mono'; letter-spacing:0.06em; }
+  .cart-close{ border:0; background:transparent; font-size:1.4rem; color:var(--ink); line-height:1; padding:4px 8px; }
+
+  .cart-list{ flex:1; overflow-y:auto; padding:10px 20px; }
+  .cart-empty{ text-align:center; padding:50px 10px; color:var(--ink-soft); }
+  .cart-empty .emoji{ font-size:2.2rem; margin-bottom:8px; }
+
+  .cart-item{ padding:12px 0; border-bottom:1px dashed var(--line); display:flex; gap:12px; }
+  .cart-item .ci-icon{
+    width:42px; height:42px; border-radius:50%; background:var(--tint,var(--paper));
+    display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex:0 0 auto;
+  }
+  .cart-item .ci-main{ flex:1; min-width:0; }
+  .cart-item .ci-name{ font-weight:700; font-size:0.86rem; margin-bottom:6px; }
+  .qty-stepper{ display:flex; align-items:center; gap:8px; }
+  .qty-stepper button{
+    width:24px; height:24px; border:1px solid var(--ink); background:var(--paper-alt);
+    border-radius:3px; font-weight:700; line-height:1;
+  }
+  .qty-stepper .qty{ font-family:'IBM Plex Mono'; font-size:0.85rem; min-width:16px; text-align:center; }
+  .ci-remove{ border:0; background:transparent; color:var(--chili); font-size:0.72rem; font-weight:700; margin-left:10px; text-decoration:underline; }
+
+  .ci-breakdown{
+    font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--ink-soft);
+    text-align:right; flex:0 0 auto; display:flex; flex-direction:column; gap:2px; min-width:96px;
+  }
+  .ci-breakdown .total{ color:var(--ink); font-weight:700; font-size:0.85rem; }
+  .ci-breakdown .free{ color:var(--teal); font-weight:700; }
+
+  .cart-footer{ padding:14px 20px 20px; border-top:2px dashed var(--line); }
+  .totals-row{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono'; font-size:0.82rem; margin-bottom:4px; color:var(--ink-soft); }
+  .totals-row.grand{ font-size:1.05rem; color:var(--ink); font-weight:800; border-top:1px solid var(--line); margin-top:8px; padding-top:8px; }
+  .checkout-btn{
+    width:100%; margin-top:12px; padding:13px; border:0; border-radius:var(--radius);
+    background:var(--chili); color:var(--paper-alt); font-weight:800; font-size:0.95rem; letter-spacing:0.02em;
+  }
+  .checkout-btn:hover{ background:var(--chili-dark); }
+  .checkout-btn:disabled{ background:var(--line); color:var(--ink-soft); cursor:not-allowed; }
+
+  /* ---------- Invoice modal ---------- */
+  .invoice-modal{
+    position:fixed; z-index:70; top:50%; left:50%; transform:translate(-50%,-46%);
+    width:min(400px,92vw); max-height:86vh; overflow-y:auto;
+    background:var(--paper-alt); box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+  }
+  .invoice-modal.show{ opacity:1; pointer-events:auto; transform:translate(-50%,-50%); }
+  .invoice-body{ padding:20px 22px 24px; }
+  .invoice-body h2{ font-size:1.7rem; color:var(--ink); text-align:center; }
+  .invoice-body .meta{ text-align:center; font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--ink-soft); margin-top:6px; }
+  .invoice-items{ margin-top:16px; border-top:1px dashed var(--line); padding-top:10px; }
+  .invoice-line{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono'; font-size:0.76rem; padding:3px 0; color:var(--ink-soft); }
+  .invoice-line span:first-child{ color:var(--charcoal); }
+  .invoice-note{ font-size:0.76rem; color:var(--ink-soft); text-align:center; margin-top:16px; line-height:1.5; }
+  .new-order-btn{
+    width:100%; margin-top:16px; padding:12px; border:2px solid var(--ink); background:transparent;
+    color:var(--ink); font-weight:700; border-radius:var(--radius);
+  }
+  .new-order-btn:hover{ background:var(--ink); color:var(--paper-alt); }
+
+  @media (max-width:640px){
+    .cart-drawer{ width:100%; }
+    .hero{ padding-top:30px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="display">MANDI</span>
+      <span class="tagline">sab kuch, ek cart</span>
+    </div>
+    <form class="search-wrap" id="searchForm">
+      <input type="text" id="searchInput" placeholder="Search for anything — earbuds, sarees, dumbbells…" aria-label="Search products" />
+      <button type="submit">Search</button>
+    </form>
+    <button class="cart-btn" id="cartOpenBtn" aria-label="Open cart">
+      🛍️ Cart <span class="badge mono" id="cartCount">0</span>
+    </button>
+  </header>
+
+  <nav class="category-rail" id="categoryRail"></nav>
+
+  <section class="hero">
+    <h1 class="display">EVERY STALL.<br /><span>ONE BILL.</span></h1>
+    <p class="sub">Electronics to groceries, sarees to study lamps — the whole mandi under one roof, with the price tag telling you the whole truth up front.</p>
+
+    <div class="rule-boards">
+      <div class="board marigold">
+        <div class="board-top"><span class="board-icon">🚚</span><span class="board-title">FREE DELIVERY</span></div>
+        <p>On every single item priced above ₹2,000 — no minimum cart size needed.</p>
+        <p class="mono">RULE_01 · unit_price &gt; ₹2000 → delivery ₹0</p>
+      </div>
+      <div class="board teal">
+        <div class="board-top"><span class="board-icon">🧾</span><span class="board-title">18% GST, ALWAYS SHOWN</span></div>
+        <p>Every product on the shelf carries GST at 18%, itemised right on its tag — no surprises at billing.</p>
+        <p class="mono">RULE_02 · gst = base_price × 0.18</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <span class="count mono" id="resultCount"></span>
+    <select id="sortSelect" aria-label="Sort products">
+      <option value="featured">Sort: Featured</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+
+  <main class="grid" id="productGrid"></main>
+
+  <footer>
+    Mandi is a demo storefront. Prices shown in ₹ (INR) ·
+    <span class="mono">GST 18%</span> and
+    <span class="mono">free delivery over ₹2,000</span> are configurable rules in the code, not a live payment system.
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+    <div class="torn-top"></div>
+    <div class="cart-header">
+      <div>
+        <h2>Your Bill</h2>
+        <div class="sub">MANDI · DEMO INVOICE</div>
+      </div>
+      <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-list" id="cartList"></div>
+    <div class="cart-footer">
+      <div class="totals-row"><span>Subtotal</span><span class="mono" id="sumSubtotal">₹0</span></div>
+      <div class="totals-row"><span>GST (18%)</span><span class="mono" id="sumGst">₹0</span></div>
+      <div class="totals-row"><span>Delivery</span><span class="mono" id="sumDelivery">₹0</span></div>
+      <div class="totals-row grand"><span>Grand Total</span><span class="mono" id="sumGrand">₹0</span></div>
+      <button class="checkout-btn" id="checkoutBtn" disabled>Checkout</button>
+    </div>
+  </aside>
+
+  <div class="invoice-modal" id="invoiceModal" role="dialog" aria-label="Order confirmation">
+    <div class="invoice-body">
+      <h2>Order Placed 🎉</h2>
+      <div class="meta" id="invoiceMeta"></div>
+      <div class="invoice-items" id="invoiceItems"></div>
+      <div class="invoice-items" id="invoiceTotals" style="border-top:2px dashed var(--line); margin-top:10px; padding-top:10px;"></div>
+      <p class="invoice-note">This is a demo checkout — no real payment was processed and no order was actually shipped from anywhere.</p>
+      <button class="new-order-btn" id="newOrderBtn">Start a New Order</button>
+    </div>
+  </div>
+
+<script>
+  // ---------- Configurable business rules ----------
+  const GST_RATE = 0.18;                 // 18% GST on every product
+  const FREE_DELIVERY_THRESHOLD = 2000;  // unit price above which delivery is free
+  const FLAT_DELIVERY_FEE = 49;          // flat fee per line item when below threshold
+
+  // ---------- Catalog ----------
+  const PRODUCTS = [
+    {id:1,  name:"Wireless Earbuds Pro",        category:"electronics", price:1799,  icon:"🎧"},
+    {id:2,  name:'43" Smart LED TV',             category:"electronics", price:22999, icon:"📺"},
+    {id:3,  name:"Portable Bluetooth Speaker",   category:"electronics", price:1299,  icon:"🔊"},
+    {id:4,  name:"Travel Laptop Backpack",       category:"electronics", price:2499,  icon:"🎒"},
+    {id:5,  name:"Smartwatch Series X",          category:"electronics", price:3499,  icon:"⌚"},
+    {id:6,  name:"Men's Cotton Kurta",           category:"fashion",     price:899,   icon:"👘"},
+    {id:7,  name:"Handloom Silk Saree",          category:"fashion",     price:2799,  icon:"🥻"},
+    {id:8,  name:"Everyday Running Shoes",       category:"fashion",     price:2199,  icon:"👟"},
+    {id:9,  name:"Genuine Leather Wallet",       category:"fashion",     price:649,   icon:"👛"},
+    {id:10, name:"Non-Stick Cookware Set",       category:"home",        price:2399,  icon:"🍳"},
+    {id:11, name:"Digital Air Fryer 4L",         category:"home",        price:3999,  icon:"🍟"},
+    {id:12, name:"Cotton Bedsheet Set",          category:"home",        price:1099,  icon:"🛏️"},
+    {id:13, name:"Adjustable Study Lamp",        category:"home",        price:749,   icon:"💡"},
+    {id:14, name:"Bestseller Fiction Bundle",    category:"books",       price:899,   icon:"📚"},
+    {id:15, name:"Complete Encyclopedia Set",    category:"books",       price:2999,  icon:"📖"},
+    {id:16, name:"Skincare Gift Hamper",         category:"beauty",      price:1599,  icon:"🧴"},
+    {id:17, name:"Grooming & Trimmer Kit",       category:"beauty",      price:1299,  icon:"🪒"},
+    {id:18, name:"Premium Yoga Mat",             category:"sports",      price:899,   icon:"🧘"},
+    {id:19, name:"Kashmir Willow Cricket Bat",   category:"sports",      price:1799,  icon:"🏏"},
+    {id:20, name:"Adjustable Dumbbell Set",      category:"sports",      price:2599,  icon:"🏋️"},
+    {id:21, name:"Assorted Dry Fruits 1kg",      category:"grocery",     price:899,   icon:"🥜"},
+    {id:22, name:"Cold-Pressed Oil Combo",       category:"grocery",     price:749,   icon:"🫒"},
+    {id:23, name:"Wooden Building Blocks",       category:"toys",        price:1099,  icon:"🧱"},
+    {id:24, name:"Remote Control Racer",         category:"toys",        price:2199,  icon:"🚗"},
+  ];
+
+  const CATEGORIES = [
+    {key:'all',         label:'All Stalls'},
+    {key:'electronics', label:'Electronics'},
+    {key:'fashion',     label:'Fashion'},
+    {key:'home',        label:'Home & Kitchen'},
+    {key:'books',       label:'Books'},
+    {key:'beauty',      label:'Beauty'},
+    {key:'sports',      label:'Sports'},
+    {key:'grocery',     label:'Grocery'},
+    {key:'toys',        label:'Toys'},
+  ];
+
+  const TINTS = {
+    electronics:'#DCEAE7', fashion:'#F3DAD3', home:'#FBEBD0', books:'#E4E5EA',
+    beauty:'#F7E1DC', sports:'#DDEFE9', grocery:'#FCEFD4', toys:'#E9E9EE'
+  };
+
+  // ---------- State ----------
+  let activeCategory = 'all';
+  let searchTerm = '';
+  let sortMode = 'featured';
+  const cart = {}; // { productId: qty }
+
+  // ---------- Helpers ----------
+  const formatINR = n => '₹' + n.toLocaleString('en-IN', {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2
+  });
+
+  function lineFigures(product, qty){
+    const base = product.price * qty;
+    const gst = product.price * GST_RATE * qty;
+    const freeDelivery = product.price > FREE_DELIVERY_THRESHOLD;
+    const delivery = freeDelivery ? 0 : FLAT_DELIVERY_FEE;
+    const total = base + gst + delivery;
+    return { base, gst, delivery, freeDelivery, total };
+  }
+
+  // ---------- Render: category chips ----------
+  const rail = document.getElementById('categoryRail');
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (cat.key === activeCategory ? ' active' : '');
+    btn.textContent = cat.label;
+    btn.dataset.key = cat.key;
+    rail.appendChild(btn);
+  });
+  rail.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    activeCategory = chip.dataset.key;
+    [...rail.children].forEach(c => c.classList.toggle('active', c.dataset.key === activeCategory));
+    renderGrid();
+  });
+
+  // ---------- Render: product grid ----------
+  const grid = document.getElementById('productGrid');
+  const resultCount = document.getElementById('resultCount');
+
+  function getFilteredProducts(){
+    let list = PRODUCTS.filter(p =>
+      (activeCategory === 'all' || p.category === activeCategory) &&
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    if(sortMode === 'low') list = [...list].sort((a,b)=>a.price-b.price);
+    if(sortMode === 'high') list = [...list].sort((a,b)=>b.price-a.price);
+    return list;
+  }
+
+  function renderGrid(){
+    const list = getFilteredProducts();
+    resultCount.textContent = `Showing ${list.length} of ${PRODUCTS.length} products`;
+    grid.innerHTML = '';
+
+    if(list.length === 0){
+      grid.innerHTML = `<div class="empty-grid" style="grid-column:1/-1">
+        <div class="emoji">🕵️</div>
+        <p>No stalls selling that today. Try a different search.</p>
+      </div>`;
+      return;
+    }
+
+    list.forEach((p, i) => {
+      const gst = p.price * GST_RATE;
+      const payable = p.price + gst;
+      const freeDelivery = p.price > FREE_DELIVERY_THRESHOLD;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = (i * 0.03) + 's';
+      card.dataset.id = p.id;
+      card.innerHTML = `
+        ${freeDelivery ? '<span class="free-badge">Free Delivery</span>' : ''}
+        <div class="card-icon" style="--tint:${TINTS[p.category]}">${p.icon}</div>
+        <div class="cat-label">${CATEGORIES.find(c=>c.key===p.category).label}</div>
+        <div class="name">${p.name}</div>
+        <div class="price-breakdown">
+          <div class="row"><span>Base price</span><span>${formatINR(p.price)}</span></div>
+          <div class="row"><span>GST (18%)</span><span>+${formatINR(gst)}</span></div>
+          <div class="row payable"><span>You pay</span><span>${formatINR(payable)}</span></div>
+        </div>
+        <button class="add-btn" data-id="${p.id}">Add to Cart</button>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  grid.addEventListener('click', e => {
+    const btn = e.target.closest('.add-btn');
+    if(!btn) return;
+    const id = Number(btn.dataset.id);
+    cart[id] = (cart[id] || 0) + 1;
+    pulseCart();
+    renderCart();
+  });
+
+  // ---------- Search & sort ----------
+  document.getElementById('searchForm').addEventListener('submit', e => e.preventDefault());
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchTerm = e.target.value;
+    renderGrid();
+  });
+  document.getElementById('sortSelect').addEventListener('change', e => {
+    sortMode = e.target.value;
+    renderGrid();
+  });
+
+  // ---------- Cart drawer ----------
+  const overlay = document.getElementById('overlay');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const cartOpenBtn = document.getElementById('cartOpenBtn');
+  const cartCloseBtn = document.getElementById('cartCloseBtn');
+  const cartCount = document.getElementById('cartCount');
+  const cartList = document.getElementById('cartList');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const invoiceModal = document.getElementById('invoiceModal');
+
+  function pulseCart(){
+    cartOpenBtn.classList.remove('pulse');
+    void cartOpenBtn.offsetWidth;
+    cartOpenBtn.classList.add('pulse');
+  }
+
+  function openCart(){
+    cartDrawer.classList.add('open');
+    overlay.classList.add('show');
+  }
+  function closeCart(){
+    cartDrawer.classList.remove('open');
+    if(!invoiceModal.classList.contains('show')) overlay.classList.remove('show');
+  }
+  cartOpenBtn.addEventListener('click', openCart);
+  cartCloseBtn.addEventListener('click', closeCart);
+  overlay.addEventListener('click', () => { closeCart(); closeInvoice(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeCart(); closeInvoice(); } });
+
+  function renderCart(){
+    const ids = Object.keys(cart).filter(id => cart[id] > 0);
+    cartCount.textContent = ids.reduce((sum,id) => sum + cart[id], 0);
+    cartList.innerHTML = '';
+
+    if(ids.length === 0){
+      cartList.innerHTML = `<div class="cart-empty">
+        <div class="emoji">🛍️</div>
+        <p>Your thela is empty.<br />Add something from the shelf.</p>
+      </div>`;
+      checkoutBtn.disabled = true;
+    } else {
+      checkoutBtn.disabled = false;
+      let subtotal = 0, gstTotal = 0, deliveryTotal = 0;
+
+      ids.forEach(id => {
+        const product = PRODUCTS.find(p => p.id === Number(id));
+        const qty = cart[id];
+        const fig = lineFigures(product, qty);
+        subtotal += fig.base; gstTotal += fig.gst; deliveryTotal += fig.delivery;
+
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.dataset.id = id;
+        row.innerHTML = `
+          <div class="ci-icon" style="--tint:${TINTS[product.category]}">${product.icon}</div>
+          <div class="ci-main">
+            <div class="ci-name">${product.name}</div>
+            <div class="qty-stepper">
+              <button data-action="dec" data-id="${id}" aria-label="Decrease quantity">−</button>
+              <span class="qty mono">${qty}</span>
+              <button data-action="inc" data-id="${id}" aria-label="Increase quantity">+</button>
+              <button class="ci-remove" data-action="remove" data-id="${id}">Remove</button>
+            </div>
+          </div>
+          <div class="ci-breakdown">
+            <span>Base ${formatINR(fig.base)}</span>
+            <span>GST +${formatINR(fig.gst)}</span>
+            <span class="${fig.freeDelivery ? 'free' : ''}">${fig.freeDelivery ? 'Delivery FREE' : 'Delivery +' + formatINR(fig.delivery)}</span>
+            <span class="total">${formatINR(fig.total)}</span>
+          </div>
+        `;
+        cartList.appendChild(row);
+      });
+
+      const grand = subtotal + gstTotal + deliveryTotal;
+      document.getElementById('sumSubtotal').textContent = formatINR(subtotal);
+      document.getElementById('sumGst').textContent = '+' + formatINR(gstTotal);
+      document.getElementById('sumDelivery').textContent = deliveryTotal === 0 ? 'FREE' : '+' + formatINR(deliveryTotal);
+      document.getElementById('sumGrand').textContent = formatINR(grand);
+    }
+
+    if(ids.length === 0){
+      document.getElementById('sumSubtotal').textContent = '₹0';
+      document.getElementById('sumGst').textContent = '₹0';
+      document.getElementById('sumDelivery').textContent = '₹0';
+      document.getElementById('sumGrand').textContent = '₹0';
+    }
+  }
+
+  cartList.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+    if(action === 'inc') cart[id] += 1;
+    if(action === 'dec') { cart[id] -= 1; if(cart[id] <= 0) delete cart[id]; }
+    if(action === 'remove') delete cart[id];
+    renderCart();
+  });
+
+  // ---------- Checkout / invoice ----------
+  function closeInvoice(){
+    invoiceModal.classList.remove('show');
+    if(!cartDrawer.classList.contains('open')) overlay.classList.remove('show');
+  }
+
+  checkoutBtn.addEventListener('click', () => {
+    const ids = Object.keys(cart).filter(id => cart[id] > 0);
+    if(ids.length === 0) return;
+
+    let subtotal = 0, gstTotal = 0, deliveryTotal = 0;
+    const itemsEl = document.getElementById('invoiceItems');
+    itemsEl.innerHTML = '';
+
+    ids.forEach(id => {
+      const product = PRODUCTS.find(p => p.id === Number(id));
+      const qty = cart[id];
+      const fig = lineFigures(product, qty);
+      subtotal += fig.base; gstTotal += fig.gst; deliveryTotal += fig.delivery;
+      const line = document.createElement('div');
+      line.className = 'invoice-line';
+      line.innerHTML = `<span>${product.name} × ${qty}</span><span>${formatINR(fig.total)}</span>`;
+      itemsEl.appendChild(line);
+    });
+
+    const grand = subtotal + gstTotal + deliveryTotal;
+    const totalsEl = document.getElementById('invoiceTotals');
+    totalsEl.innerHTML = `
+      <div class="invoice-line"><span>Subtotal</span><span>${formatINR(subtotal)}</span></div>
+      <div class="invoice-line"><span>GST (18%)</span><span>+${formatINR(gstTotal)}</span></div>
+      <div class="invoice-line"><span>Delivery</span><span>${deliveryTotal === 0 ? 'FREE' : '+' + formatINR(deliveryTotal)}</span></div>
+      <div class="invoice-line" style="font-weight:800; color:var(--ink); font-size:0.95rem; margin-top:4px;"><span>Grand Total</span><span>${formatINR(grand)}</span></div>
+    `;
+
+    const orderId = 'MANDI-' + Math.floor(100000 + Math.random() * 900000);
+    const when = new Date().toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+    document.getElementById('invoiceMeta').textContent = `Order ${orderId} · ${when}`;
+
+    cartDrawer.classList.remove('open');
+    invoiceModal.classList.add('show');
+    overlay.classList.add('show');
+  });
+
+  document.getElementById('newOrderBtn').addEventListener('click', () => {
+    Object.keys(cart).forEach(id => delete cart[id]);
+    renderCart();
+    closeInvoice();
+  });
+
+  // ---------- Init ----------
+  renderGrid();
+  renderCart();
+</script>
+</body>
+</html>
