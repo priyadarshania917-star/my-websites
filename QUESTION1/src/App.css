@@ -1,0 +1,33 @@
+main {
+  width: 90%;
+  max-width: 800px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+h1 {
+  color: #1d3557;
+}
+
+.student-list {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.student-card {
+  width: 260px;
+  padding: 20px;
+  text-align: left;
+  background-color: #ffffff;
+  border: 1px solid #b8c7d9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(29, 53, 87, 0.12);
+}
+
+.student-card h2 {
+  margin-top: 0;
+  color: #457b9d;
+}
